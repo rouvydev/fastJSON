@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+#if NET4
+using System.Linq;
+#endif
+using System.Runtime.Serialization;
 
 namespace fastJSON
 {
@@ -241,14 +245,28 @@ namespace fastJSON
         //    return 0;
         //}
 
-        public static object CreateEnum(Type pt, object v)
+        public static object CreateEnum(Type pt, object v, bool enumMemberNames = true)
         {
-            // FEATURE : optimize create enum
-#if !SILVERLIGHT
-            return Enum.Parse(pt, v.ToString(), true);
-#else
-            return Enum.Parse(pt, v, true);
+            // Change by @AlesRazym and @JanBartosek: Add EnumMemberAttribute to fastJSON Enum processing.
+
+            var str = v.ToString();
+#if NET4
+            if (enumMemberNames)
+            {
+                //TODO: NET4 vs lower EnumMemberAttribute, see fastJSON.DataMemberAttribute.
+                foreach (var name in Enum.GetNames(pt))
+                {
+                    var enumMemberAttribute = ((EnumMemberAttribute[])pt.GetField(name)
+                        .GetCustomAttributes(typeof(EnumMemberAttribute), true))
+                        .FirstOrDefault();
+
+                    if (enumMemberAttribute?.Value == str)
+                        return Enum.Parse(pt, name);
+                }
+            }
+            // End Change
 #endif
+            return Enum.Parse(pt, str, true);
         }
 
         public static Guid CreateGuid(string s)

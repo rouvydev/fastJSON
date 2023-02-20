@@ -61,6 +61,14 @@ namespace fastJSON
         /// Output Enum values instead of names (default = False)
         /// </summary>
         public bool UseValuesOfEnums = false;
+
+        // Change by @JanBartosek: Add option to turn on/off EnumMemberAttribute Enum processing.
+        /// <summary>
+        /// Consider the EnumMemberAttribute in case of (de)serialization of enums (default = False).
+        /// </summary>
+        public bool UseEnumsMemberAttributeNames = false;
+        // End change.
+
         /// <summary>
         /// Ignore attributes to check for (default : XmlIgnoreAttribute, NonSerialized)
         /// </summary>
@@ -162,6 +170,7 @@ namespace fastJSON
                 UseOptimizedDatasetSchema = UseOptimizedDatasetSchema,
                 UseUTCDateTime = UseUTCDateTime,
                 UseValuesOfEnums = UseValuesOfEnums,
+                UseEnumsMemberAttributeNames = UseEnumsMemberAttributeNames,
                 UsingGlobalTypes = UsingGlobalTypes,
                 AutoConvertStringToNumbers = AutoConvertStringToNumbers,
                 OverrideObjectHashCodeChecking = OverrideObjectHashCodeChecking,
@@ -544,7 +553,7 @@ namespace fastJSON
                 return (string)value;
 
             else if (conversionType.IsEnum)
-                return Helper.CreateEnum(conversionType, value);
+                return Helper.CreateEnum(conversionType, value, _params.UseEnumsMemberAttributeNames);
 
             else if (conversionType == typeof(DateTime))
                 return Helper.CreateDateTime((string)value, _params.UseUTCDateTime);
@@ -758,7 +767,7 @@ namespace fastJSON
                             case myPropInfoType.String: oset = v.ToString(); break;
                             case myPropInfoType.Bool: oset = Helper.BoolConv(v); break;
                             case myPropInfoType.DateTime: oset = Helper.CreateDateTime((string)v, _params.UseUTCDateTime); break;
-                            case myPropInfoType.Enum: oset = Helper.CreateEnum(pi.pt, v); break;
+                            case myPropInfoType.Enum: oset = Helper.CreateEnum(pi.pt, v, _params.UseEnumsMemberAttributeNames); break;
                             case myPropInfoType.Guid: oset = Helper.CreateGuid((string)v); break;
 
                             case myPropInfoType.Array:

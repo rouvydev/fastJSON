@@ -8,6 +8,10 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Collections.Specialized;
+using System.Runtime.Serialization;
+#if NET4
+using System.Linq;
+#endif
 
 namespace fastJSON
 {
@@ -250,11 +254,29 @@ namespace fastJSON
 
         private void WriteEnum(Enum e)
         {
-            // FEATURE : optimize enum write
             if (_params.UseValuesOfEnums)
                 WriteValue(Convert.ToInt32(e));
             else
+            {
+                // Change by @AlesRazym and @JanBartosek: Add EnumMemberAttribute to fastJSON Enum processing.
+#if NET4
+                EnumMemberAttribute attribute = null;
+
+                if (_params.UseEnumsMemberAttributeNames)
+                {
+                    //TODO: NET4 vs lower EnumMemberAttribute, see fastJSON.DataMemberAttribute.
+                    attribute = e.GetType()
+                        .GetField(e.ToString())
+                        .GetCustomAttributes(typeof(EnumMemberAttribute), false)
+                        .SingleOrDefault() as EnumMemberAttribute;
+                }
+
+                WriteStringFast(attribute == null ? e.ToString() : attribute.Value);
+#else
                 WriteStringFast(e.ToString());
+#endif
+                // End change.
+            }
         }
 
         private void WriteGuid(Guid g)
