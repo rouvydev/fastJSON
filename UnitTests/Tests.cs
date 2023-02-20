@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-#if !SILVERLIGHT
 using NUnit.Framework;
 using System.Data;
-#endif
 using System.Collections;
 using System.Threading;
 using fastJSON;
@@ -13,39 +11,8 @@ using System.Linq.Expressions;
 using System.Diagnostics;
 using System.Linq;
 using System.Dynamic;
-using System.Runtime.Serialization;
 using System.Collections.ObjectModel;
 
-//namespace UnitTests
-//{
-#if SILVERLIGHT
-	public class TestAttribute : Attribute
-	{
-	}
-
-	public static class Assert
-	{
-		public static void IsNull(object o, string msg)
-		{
-			System.Diagnostics.Debug.Assert(o == null, msg);
-		}
-
-		public static void IsNotNull(object o)
-		{
-			System.Diagnostics.Debug.Assert(o != null);
-		}
-
-		public static void AreEqual(object e, object a)
-		{
-			System.Diagnostics.Debug.Assert(e.Equals(a));
-		}
-
-		public static void IsInstanceOf<T>(object o)
-		{
-			System.Diagnostics.Debug.Assert(typeof(T) == o.GetType());
-		}
-	}
-#endif
 public class tests
 {
     #region [  helpers  ]
@@ -211,9 +178,7 @@ public class tests
         public object obj;
         public string ppp { get { return "sdfas df "; } }
         public DateTime date { get; set; }
-#if !SILVERLIGHT
         public DataTable ds { get; set; }
-#endif
     }
 
     public struct Retstruct
@@ -224,9 +189,7 @@ public class tests
         public int Field2;
         public string ppp { get { return "sdfas df "; } }
         public DateTime date { get; set; }
-#if !SILVERLIGHT
         public DataTable ds { get; set; }
-#endif
     }
 
     private static long CreateLong(string s)
@@ -1432,46 +1395,7 @@ public class tests
         var iii = JSON.ToObject(s);
         Assert.AreEqual(3, (iii as lol2).r[0].Length);
     }
-    //[Test]
-    //public static void Exception()
-    //{
-    //    var e = new Exception("hello");
-
-    //    var s = fastJSON.JSON.ToJSON(e);
-    //    Console.WriteLine(s);
-    //    var o = fastJSON.JSON.ToObject(s);
-    //    Assert.AreEqual("hello", (o as Exception).Message);
-    //}
-    //public class ilistclass
-    //{
-    //    public string name;
-    //    public IList<colclass> list { get; set; }
-    //}
-
-    //[Test]
-    //public static void ilist()
-    //{
-    //    ilistclass i = new ilistclass();
-    //    i.name = "aa";
-    //    i.list = new List<colclass>();
-    //    i.list.Add(new colclass() { gender = Gender.Female, date = DateTime.Now, isNew = true });
-
-    //    var s = fastJSON.JSON.ToJSON(i);
-    //    Console.WriteLine(s);
-    //    var o = fastJSON.JSON.ToObject(s);
-    //}
-
-
-    //[Test]
-    //public static void listdic()
-    //{ 
-    //    string s = @"[{""1"":""a""},{""2"":""b""}]";
-    //    var o = fastJSON.JSON.ToDynamic(s);// ToObject<List<Dictionary<string, object>>>(s);
-    //    var d = o[0].Count;
-    //    Console.WriteLine(d.ToString());
-    //}
-
-
+    
     public class Y
     {
         public byte[] BinaryData;
@@ -2668,7 +2592,7 @@ public class tests
     public class TestObj
     {
 
-        [fastJSON.DataMember(Name = "D")] 
+        [fastJSON.DataMember(Name = "D")]
         public int SomeData { get; set; } = -1;
     }
 
@@ -2892,27 +2816,20 @@ public class tests
     [Test]
     public static void NonStandardKey()
     {
-        //var s = "{\"name\":\"m:e\", \"age\":42, \"address\":\"here\"}";
-        //var o = JSON.ToObject<nskeys>(s);
-
-
         var s = "{name:\"m:e\", age   \t:42, \"address\":\"here\"}";
         var o = JSON.ToObject<nskeys>(s, new JSONParameters { AllowNonQuotedKeys = true });
-        //Console.WriteLine("t1");
         Assert.AreEqual("m:e", o.name);
         Assert.AreEqual("here", o.address);
         Assert.AreEqual(42, o.age);
 
         s = "{name  \t  :\"me\", age : 42, address  :\"here\"}";
         o = JSON.ToObject<nskeys>(s, new JSONParameters { AllowNonQuotedKeys = true });
-        //Console.WriteLine("t2");
         Assert.AreEqual("me", o.name);
         Assert.AreEqual("here", o.address);
         Assert.AreEqual(42, o.age);
 
         s = "{    name   :\"me\", age : 42, address :    \"here\"}";
         o = JSON.ToObject<nskeys>(s, new JSONParameters { AllowNonQuotedKeys = true });
-        //Console.WriteLine("t3");
         Assert.AreEqual("me", o.name);
         Assert.AreEqual("here", o.address);
         Assert.AreEqual(42, o.age);
@@ -3152,7 +3069,7 @@ public class tests
 
         public override int GetHashCode()
         {
-            return X + Y;//.GetHashCode() * 23 + Y.GetHashCode() * 17;
+            return X + Y;
         }
     }
 
@@ -3194,9 +3111,6 @@ public class tests
     [Test]
     public static void HackTest()
     {
-        //        var s = @"{'$type':'System.Configuration.Install.AssemblyInstaller,System.Configuration.Install, Version=4.0.0.0,culture=neutral,PublicKeyToken=b03f5f7f11d50a3a',
-        //'Path':'file:///"
-        //.Replace("\'", "\"") + typeof(JSON).Assembly.Location.Replace("\\","/") + "\"}";
         var s = @"{
     '$types':{
         'System.Windows.Data.ObjectDataProvider, PresentationFramework, Version = 4.0.0.0, Culture = neutral, PublicKeyToken = 31bf3856ad364e35':'1',
@@ -3260,7 +3174,7 @@ public class tests
     public static void json5_non_leading_zero_decimal()
     {
         var s = "{'a':.314}".Replace("'", "\"");
-        var o = (Dictionary<string,object>)JSON.Parse(s);
+        var o = (Dictionary<string, object>)JSON.Parse(s);
         Assert.AreEqual(0.314, (decimal)o["a"]);
 
         s = "{'a':-.314}".Replace("'", "\"");
@@ -3389,8 +3303,6 @@ public class tests
         Assert.AreEqual(0x11, (long)o["a"]);
         Assert.AreEqual(0xFF2, (long)o["b"]);
         Assert.AreEqual("hello there", (string)o["c"]);
-
-        //Assert.Fail();
     }
 
     [Test]
@@ -3419,7 +3331,6 @@ hello
 there
 '";
         Console.WriteLine(JSON.Parse(s));
-        //Assert.Fail();
     }
 
     public struct sstruct
@@ -3431,7 +3342,7 @@ there
     [Test]
     public static void structstaticproperty()
     {
-        var o = new sstruct();        
+        var o = new sstruct();
 
         var s = JSON.ToJSON(o);
         Console.WriteLine(s);
@@ -3443,77 +3354,16 @@ there
         var dt = new DateTime(2021, 1, 10, 12, 0, 0, DateTimeKind.Utc);
         var js = JSON.ToJSON(dt);
         Console.WriteLine(js);
-        Assert.AreEqual(12 , JSON.ToObject<DateTime>(js, new JSONParameters() { UseUTCDateTime = true }).Hour);
+        Assert.AreEqual(12, JSON.ToObject<DateTime>(js, new JSONParameters() { UseUTCDateTime = true }).Hour);
     }
     [Test]
     public static void UTCDateFalse()
     {
         var dt = new DateTime(2021, 1, 10, 12, 0, 0, DateTimeKind.Utc);
+        var localTime = dt.ToLocalTime();
+
         var js = JSON.ToJSON(dt);
         Console.WriteLine(js);
-        Assert.AreEqual(15, JSON.ToObject<DateTime>(js, new JSONParameters() { UseUTCDateTime = false }).Hour);
+        Assert.AreEqual(localTime.Hour, JSON.ToObject<DateTime>(js, new JSONParameters() { UseUTCDateTime = false }).Hour);
     }
-    //[Test]
-    //public static void ma()
-    //{
-    //    var a = new int[2, 3] { { 1, 2, 3 },{ 4, 5, 6 } };
-    //    //var b = new int[2][3];//{ { 1, 2, 3 }, { 4, 5, 6 } };
-
-    //    Console.WriteLine(a.Rank);
-    //    Console.WriteLine(a.GetLength(0));
-    //    Console.WriteLine(a.GetLength(1));
-
-    //    var s = JSON.ToJSON(a);
-    //    Console.WriteLine(s);
-    //    var o = JSON.ToObject<int[,]>(s);
-
-    //}
-
-    //public class WordEntry
-    //{
-    //    public List<Guid> Class { set; get; }
-    //    public List<int> EdgePaths { set; get; }
-    //    public List<int> RelatedWords { set; get; }
-    //    public String Word { set; get; }
-    //    public bool Plural { set; get; }
-    //    //public Tense TenseState { set; get; }
-    //    public Guid RootForm { set; get; }
-    //    public Guid ID { set; get; }
-    //    public Single UseFrequency { set; get; }
-    //    public List<int> PartsofSpeech { set; get; }
-    //}
-
-    //[Test]
-    //public static void emptylist()
-    //{
-    //    var s = "{ 'Class': ['K2JFO+FwG0CfeuTFE283AQ=='], 'EdgePaths': [-1537686140], 'RelatedWords': [], 'Word': 'Tum-ti-tum', 'Plural': false, 'TenseState': 'present', 'RootForm': 'AAAAAAAAAAAAAAAAAAAAAA==', 'ID': '78LPEHC0wkiQQu6DvX9wzQ==', 'UseFrequency': 0, 'PartsofSpeech': [] }";
-
-    //    var o = JSON.ToObject<WordEntry>(s.Replace("\'","\""));
-
-    //}
-
-    //public static void paramobjfunc()
-    //{
-    //    var str = "";
-    //    var o = JSON.ToObject(str, new JSONParameters
-    //    {
-    //        CreateParameterConstructorObject = (t) =>
-    //        {
-    //            if (t == typeof(NullTestClass))
-    //                return new NullTestClass();
-    //            else return null;
-    //        }
-    //    });
-    //}
-
-
-    //[Test]
-    //public static void autoconvtest()
-    //{
-    //    var j = JSON.ToObject<int>("\"G\"", new JSONParameters { AutoConvertStringToNumbers = false });
-    //    var i = JSON.ToObject<Item>("{\"Id\":\"G\"}", new JSONParameters { AutoConvertStringToNumbers = false });
-    //}
-
-}// UnitTests.Tests
- //}
-
+}
